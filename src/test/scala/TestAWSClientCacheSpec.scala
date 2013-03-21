@@ -6,19 +6,15 @@ import scala.util.{Try, Success, Failure}
 import scala.collection.mutable.HashMap
 
 import akka.util.Timeout
-import akka.actor.ActorSystem
-import akka.actor.Actor
-import akka.actor.Props
+import akka.actor._
 import akka.pattern.ask
-import akka.testkit.TestKit
-import akka.testkit.TestActorRef
-import akka.testkit.ImplicitSender
+import akka.testkit._
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.BeforeAndAfterAll
 
 import com.automatedlabs.akka.aws._
-import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.auth._
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchAsyncClient
 
@@ -34,9 +30,11 @@ with FunSpec with ShouldMatchers with BeforeAndAfterAll {
       system.shutdown()
     }
 
-  val cacheActorRef = TestActorRef[AWSClientCacheActor]
+    val cacheActorRef = TestActorRef[AWSClientCacheActor]
     val cacheActor = cacheActorRef.underlyingActor
     val credentials = new BasicAWSCredentials("AAAAA", "BBBBB")
+    val creds2 = new BasicAWSCredentials("ZZZZZ", "YYYYY")
+    val anonCreds = new AnonymousAWSCredentials()
 
     describe("An AWSClientCache actor") {
 
@@ -104,7 +102,27 @@ with FunSpec with ShouldMatchers with BeforeAndAfterAll {
             }
           }
         }
+        describe ("using the credentials 'ZZZZZ'") {
+          it ("should accept a GetCloudWatchMessage") {
+            cacheActorRef ! GetCloudWatchClient(creds2)
+            expectMsgClass(200.millis, classOf[AmazonCloudWatchAsyncClient])
+          }
 
+          it ("should have two items in the cache") {
+            cacheActor.clientCache should have size (2)
+          }
+
+          describe ("the cache entry for 'ZZZZZ'") {
+            it ("should have one client entry in it") {
+              cacheActor.clientCache.get("ZZZZZ").map { _ should have size (1) }
+            }
+          }
+        }
+
+      }
+
+      describe ("when using AnonymousAWSCredentials") {
+        it ("should accept a request") (pending)
       }
     }
 }
