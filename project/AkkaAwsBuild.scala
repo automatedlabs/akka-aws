@@ -15,7 +15,8 @@ object AkkaAwsBuild extends Build {
         "com.typesafe.akka" %% "akka-actor" % "2.1.1",
         "com.typesafe.akka" %% "akka-testkit" % "2.1.1",
         "com.amazonaws" % "aws-java-sdk" % "1.3.33",
-        "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+        "org.scalatest" %% "scalatest" % "1.9.1" % "test",
+        "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test"
       ),
       scalacOptions ++= Seq("-feature", "-deprecation")
     )
