@@ -18,7 +18,9 @@ object AkkaAwsBuild extends Build {
         "org.scalatest" %% "scalatest" % "1.9.1" % "test",
         "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test"
       ),
-      scalacOptions ++= Seq("-feature", "-deprecation")
+      scalacOptions ++= Seq("-feature", "-deprecation"),
+      testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF"),
+      parallelExecution in Test := false
     )
   )
 }
