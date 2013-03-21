@@ -31,7 +31,7 @@ class S3ActionActor extends Actor with ActorLogging {
           case S3ListMyBucketsCmd(_) => 
             sender ! fClient.map { c => c.listBuckets }
           case S3ListBucketCmd(_, bucket: String) =>
-            sender.tell( fClient.map { c => c.listObjects(bucket) })
+            sender ! fClient.map { c => c.listObjects(bucket) }
           case _ =>
             throw new UnsupportedOperationException("command not yet implemented")
         }
