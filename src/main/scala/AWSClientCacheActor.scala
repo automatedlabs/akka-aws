@@ -1,7 +1,7 @@
 package com.automatedlabs.akka.aws
 
-import scala.collection.mutable.HashMap
 import scala.concurrent.duration._
+import scala.collection.mutable
 
 import akka.actor._
 import akka.util.Timeout
@@ -11,16 +11,16 @@ import com.amazonaws.AmazonWebServiceClient
 
 class AWSClientCacheActor extends Actor with ActorLogging {
 
-  implicit val timeout = Timeout(5.seconds)
+  implicit val timeout = Timeout(1.seconds)
 
-  val clientCache = new HashMap[String ,HashMap[
+  val clientCache = new mutable.HashMap[String, mutable.HashMap[
                           Class[_ <: AmazonWebServiceClient], AmazonWebServiceClient]] 
 
   def receive = {
     case req : GetAWSClient =>
       sender ! clientCache.
         getOrElseUpdate(req.credentials.getAWSAccessKeyId, 
-                        new HashMap[Class[_ <: AmazonWebServiceClient], AmazonWebServiceClient]).
+                        new mutable.HashMap[Class[_ <: AmazonWebServiceClient], AmazonWebServiceClient]).
         getOrElseUpdate(req.clientType, req.createClient(req.credentials))
   }
 
